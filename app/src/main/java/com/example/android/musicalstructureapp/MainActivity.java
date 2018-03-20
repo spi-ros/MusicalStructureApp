@@ -1,5 +1,7 @@
 package com.example.android.musicalstructureapp;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -9,19 +11,19 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class MainActivity extends AppCompatActivity {
-
-    private GestureDetectorCompat gestureObject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.song_list);
-
-        gestureObject = new GestureDetectorCompat(this, new MainActivity.LearnGesture());
 
         final ArrayList<Song> songs = new ArrayList<>();
         songs.add(new Song("Prince & The Revolution", "Let's Go Crazy", "Purple Rain", R.drawable.play_arrow));
@@ -55,47 +57,68 @@ public class MainActivity extends AppCompatActivity {
         songs.add(new Song("Daft Punk", "Doin' It Right", "Random Access Memories", R.drawable.play_arrow));
         songs.add(new Song("Daft Punk", "Contact", "Random Access Memories", R.drawable.play_arrow));
 
+
+        Collections.sort(songs, new Comparator<Song>() {
+            @Override
+            public int compare(Song o1, Song o2) {
+                return o1.getSongTitle().compareToIgnoreCase(o2.getSongTitle());
+            }
+        });
+
         SongAdapter adapter = new SongAdapter(this, songs);
 
-        ListView listView = findViewById(R.id.song_list_view);
+        final ListView listView = findViewById(R.id.song_list_view);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Song song = songs.get(position);
                 Intent intent = new Intent(MainActivity.this, RightActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.right_to_left_a, R.anim.right_to_left_b);
             }
         });
-    }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        this.gestureObject.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
-    class LearnGesture extends GestureDetector.SimpleOnGestureListener {
-
-        @Override
-        public boolean onFling (MotionEvent event1, MotionEvent event2,
-                                float velocityX, float velocityY) {
-            if (event2.getX() > event1.getX()) {
-
-                Intent intent = new Intent(MainActivity.this, LeftActivity.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.left_to_right_a, R.anim.left_to_right_b);
-
-            } else if (event2.getX() < event1.getX()) {
-
-                Intent intent = new Intent(MainActivity.this, RightActivity.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.right_to_left_a, R.anim.right_to_left_b);
-
-
+        TextView songTextView = findViewById(R.id.song);
+        songTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collections.sort(songs, new Comparator<Song>() {
+                    @Override
+                    public int compare(Song o1, Song o2) {
+                        return o1.getSongTitle().compareToIgnoreCase(o2.getSongTitle());
+                    }
+                });
             }
-            return true;
-        }
+        });
+
+        TextView artistTextView = findViewById(R.id.artist);
+        artistTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collections.sort(songs, new Comparator<Song>() {
+                    @Override
+                    public int compare(Song o1, Song o2) {
+                        return o1.getArtistName().compareToIgnoreCase(o2.getArtistName());
+                    }
+                });
+                Toast.makeText(MainActivity.this, "Malaka", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        TextView albumTextView = findViewById(R.id.album);
+        albumTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Collections.sort(songs, new Comparator<Song>() {
+                    @Override
+                    public int compare(Song o1, Song o2) {
+                        return o1.getAlbumTitle().compareToIgnoreCase(o2.getAlbumTitle());
+                    }
+                });
+            }
+        });
     }
 }
